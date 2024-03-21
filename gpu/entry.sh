@@ -1,3 +1,12 @@
+
+
+## Disable all display elements that could prevent removal of nouveau module
+# Stop plymouth service used for splash screen display
+DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket dbus-send \
+    --system --dest=org.freedesktop.systemd1 --type=method_call --print-reply \
+    /org/freedesktop/systemd1   org.freedesktop.systemd1.Manager.StartUnit \
+    string:"plymouth-quit.service" string:"replace"
+
 # Remove Nouveau modules
 sleep 6
 echo 0 > /sys/class/vtconsole/vtcon1/bind
