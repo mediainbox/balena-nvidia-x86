@@ -1,0 +1,3 @@
+[submodule "workerbee"]
+	path = workerbee
+	url = https://github.com/gonzafirewall/workerbee.git

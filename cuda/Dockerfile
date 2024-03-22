@@ -1,19 +1,23 @@
-FROM balenalib/genericx86-64-ext-ubuntu:bionic
+FROM balenalib/genericx86-64-ext:latest-run-20231106
 
 WORKDIR /usr/src
 
 ENV DEBIAN_FRONTEND noninteractive
 
+# Set some variables to download the proper header modules
+ENV VERSION="4.0.23%2Brev1"
+ENV BALENA_MACHINE_NAME="genericx86-64-ext"
+
 # Set variables for the Yocto version of the OS
-ENV YOCTO_VERSION=5.10.43
+ENV YOCTO_VERSION=5.15.72
 ENV YOCTO_KERNEL=${YOCTO_VERSION}-yocto-standard
 
 # Set variables to download proper NVIDIA driver
-ENV NVIDIA_DRIVER_VERSION=470.86
+ENV NVIDIA_DRIVER_VERSION=550.67
 ENV NVIDIA_DRIVER=NVIDIA-Linux-x86_64-${NVIDIA_DRIVER_VERSION}
 
 # Install some prereqs
-RUN install_packages git wget unzip build-essential libelf-dev bc libssl-dev bison flex software-properties-common libglvnd-dev
+RUN install_packages git wget unzip build-essential libelf-dev bc libssl-dev bison flex software-properties-common pciutils libglvnd-dev
 
 WORKDIR /usr/src/nvidia
 
@@ -47,22 +51,19 @@ RUN \
     
     
 # Install CUDA Toolkit for Ubuntu per https://developer.nvidia.com/cuda-downloads
-RUN \
-    wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin && \
-    mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600 && \
-    apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub && \
-    add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/ /" && \
-    apt-get update && \
-    apt-get -y install cuda
-    
-ENV PATH="/usr/local/cuda-11.5/bin:$PATH"
-ENV LD_LIBRARY_PATH="/usr/local/cuda-11.5/lib64:$LD_LIBRARY_PATH"
 
-# Compile one CUDA sample application
 RUN \
-    cd /usr/local/cuda-11.5/samples/1_Utilities/deviceQuery && \
-    make -j8
+    wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin && \
+    mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600 && \
+    wget https://developer.download.nvidia.com/compute/cuda/12.4.0/local_installers/cuda-repo-ubuntu2204-12-4-local_12.4.0-550.54.14-1_amd64.deb && \
+    dpkg -i cuda-repo-ubuntu2204-12-4-local_12.4.0-550.54.14-1_amd64.deb && \
+    cp /var/cuda-repo-ubuntu2204-12-4-local/cuda-*-keyring.gpg /usr/share/keyrings/ && \
+    apt-get update && \
+    apt-get -y install cuda-toolkit-12-4
     
+ENV PATH="/usr/local/cuda-12.4/bin:$PATH"
+ENV LD_LIBRARY_PATH="/usr/local/cuda-12.4/lib64:$LD_LIBRARY_PATH"
+
 WORKDIR /usr/src/app
 
 COPY *.sh ./
