@@ -1,5 +1,6 @@
-version: '2'
-
+version: '2.4'
+volumes:
+  resin-data: {}
 services:
   gpu:
     build: ./gpu
@@ -21,3 +22,5 @@ services:
       io.balena.features.dbus: '1'
       io.balena.features.supervisor-api: '1'
       io.balena.features.balena-api: '1'
+    volumes:
+      - 'resin-data:/data'
