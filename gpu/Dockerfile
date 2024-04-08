@@ -1,5 +1,4 @@
-FROM balenalib/genericx86-64-ext:latest-run-20231106
-
+FROM balenalib/generic-amd64-ubuntu:latest-run-20240401
 WORKDIR /usr/src
 
 ENV DEBIAN_FRONTEND noninteractive

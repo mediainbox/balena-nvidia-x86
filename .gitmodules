@@ -1,3 +1,4 @@
 [submodule "workerbee"]
 	path = workerbee
 	url = https://github.com/mediainbox/workerbee.git
+	branch = main
